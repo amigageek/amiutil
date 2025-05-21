@@ -1,13 +1,16 @@
-#include "app.h"
+#include "Containers.h"
 
 #include <ctype.h>
-#include <libgen.h>
 #include <stdarg.h>
+
+#ifdef _POSIX_SOURCE
+#   include <libgen.h>
+#endif
 
 #define VECTOR_MIN_NUM_ELEMS 8
 
 static Status realloc_vector(Vector** new_vector_p, Vector* old_vector, size_t element_size, size_t num_elements);
-size_t round_up_pow2(size_t number);
+static size_t round_up_pow2(size_t number);
 
 void list_append(List* list, ListNode* node) {
     if (list->tail) {
@@ -15,16 +18,16 @@ void list_append(List* list, ListNode* node) {
         node->prev = list->tail;
     } else {
         list->head = node;
-        node->prev = NULL;
+        node->prev = nullptr;
     }
 
     list->tail = node;
-    node->next = NULL;  
+    node->next = nullptr;  
 }
 
 void list_init(List* list) {
-    list->head = NULL;
-    list->tail = NULL;
+    list->head = nullptr;
+    list->tail = nullptr;
 }
 
 void list_remove(List* list, ListNode* node) {
@@ -32,21 +35,21 @@ void list_remove(List* list, ListNode* node) {
         list->head = node->next;
 
         if (list->head) {
-            list->head->prev = NULL;
+            list->head->prev = nullptr;
         }
     } else if (list->tail == node) {
         list->tail = node->prev;
 
         if (list->tail) {
-            list->tail->next = NULL;
+            list->tail->next = nullptr;
         }
     } else {
         node->prev->next = node->next;
         node->next->prev = node->prev;
     }
 
-    node->prev = NULL;
-    node->next = NULL;
+    node->prev = nullptr;
+    node->next = nullptr;
 }
 
 Status string_append(char** to_string_p, const char* suffix) {
@@ -93,9 +96,10 @@ Status string_path_append(char** base_string_p, const char* suffix) {
     FINALLY RETURN;
 }
 
+#ifdef _POSIX_SOURCE
 Status string_path_dirpart(char** new_string_p, const char* path) {
     TRY
-    char* temp_path = NULL;
+    char* temp_path = nullptr;
 
     CHECK(string_clone(&temp_path, path));
     char* dir_path = dirname(temp_path);
@@ -106,6 +110,7 @@ Status string_path_dirpart(char** new_string_p, const char* path) {
 
     RETURN;
 }
+#endif
 
 void string_free(char** string_p) {
     vector_free(string_p);
@@ -127,7 +132,7 @@ Status string_printf(char** new_string_p, const char* format, ...) {
     TRY
     va_list args;
     va_start(args, format);
-    int length = vsnprintf(NULL, 0, format, args);
+    int length = vsnprintf(nullptr, 0, format, args);
     va_end(args);
 
     ASSERT(length >= 0);
@@ -173,19 +178,23 @@ Status vector_append(void* to_vector_p, size_t num_elements, const void* new_ele
     return vector_insert(to_vector_p, vector_length(*(void**)to_vector_p), num_elements, new_elements);
 }
 
+Status vector_clear(void* vector_p) {
+    return vector_remove(vector_p, 0, vector_length(*(void**)vector_p));
+}
+
 void vector_free(void* vector_p) {
     void** vector_p_typed = (void**)vector_p;
 
     if (*vector_p_typed) {
         free(VECTOR_FROM_STORAGE(*vector_p_typed));
-        *vector_p_typed = NULL;
+        *vector_p_typed = nullptr;
     }
 }
 
 Status vector_insert(void* in_vector_p, size_t at_index, size_t num_elements, const void* new_elements) {
     TRY
     Vector* vector = VECTOR_FROM_STORAGE(*(void**)in_vector_p);
-    Vector* new_vector = NULL;
+    Vector* new_vector = nullptr;
     CHECK(realloc_vector(&new_vector, vector, vector->element_size, vector->num_elements + num_elements));
 
     if (new_vector == vector) {
@@ -228,8 +237,8 @@ Status vector_insert(void* in_vector_p, size_t at_index, size_t num_elements, co
 
 Status vector_new(void* new_vector_p, size_t element_size, size_t num_elements) {
     TRY
-    Vector* vector = NULL;
-    CHECK(realloc_vector(&vector, NULL, element_size, num_elements));
+    Vector* vector = nullptr;
+    CHECK(realloc_vector(&vector, nullptr, element_size, num_elements));
 
     if (num_elements > 0) {
         memset(vector->storage, 0, num_elements * element_size);
@@ -243,7 +252,8 @@ Status vector_new(void* new_vector_p, size_t element_size, size_t num_elements) 
 Status vector_remove(void* from_vector_p, size_t at_index, size_t num_elements) {
     TRY
     Vector* vector = VECTOR_FROM_STORAGE(*(void**)from_vector_p);
-    Vector* new_vector = NULL;
+    Vector* new_vector = nullptr;
+
     CHECK(realloc_vector(&new_vector, vector, vector->element_size, vector->num_elements - num_elements));
 
     size_t end_index = at_index + num_elements;
@@ -294,7 +304,7 @@ static Status realloc_vector(Vector** new_vector_p, Vector* old_vector, size_t e
     FINALLY RETURN;
 }
 
-size_t round_up_pow2(size_t number) {
+static size_t round_up_pow2(size_t number) {
     number --;
     number |= number >> 1;
     number |= number >> 2;

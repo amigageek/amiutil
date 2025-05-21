@@ -1,10 +1,17 @@
-#include "app.h"
+#include "Application.h"
 
-#ifdef APP_GUI
+#include <proto/exec.h>
+#include <stdarg.h>
+
+#ifdef APPLICATION_GUI
 #include <proto/intuition.h>
 #endif
 
-#include <stdarg.h>
+void check_stack(void) {
+    struct Task* task = FindTask(nullptr);
+    uint stack_free = (uint)task->tc_SPReg - (uint)task->tc_SPLower;
+    printf("%u stack bytes free\n", stack_free);
+}
 
 void print_error(const char* format, ...) {
     va_list args;
@@ -13,7 +20,7 @@ void print_error(const char* format, ...) {
     static char message[128];
     vsnprintf(message, sizeof(message), format, args);
 
-#ifdef APP_GUI
+#ifdef APPLICATION_GUI
     if (IntuitionBase) {
         struct EasyStruct es = {
             .es_StructSize = sizeof(struct EasyStruct),
@@ -22,7 +29,7 @@ void print_error(const char* format, ...) {
             .es_GadgetFormat = "Ok",
         };
 
-        EasyRequest(NULL, &es, NULL);
+        EasyRequest(nullptr, &es, nullptr);
         return;
     }
 #else

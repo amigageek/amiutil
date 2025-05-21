@@ -50,11 +50,11 @@
 
 
 /* the user's options */
-#include "ufortify.h"
+#include "UFortify.h"
 
 /* Prototypes and such */
 #define __FORTIFY_C__
-#include "fortify.h"
+#include "Fortify.h"
 
 
 /*

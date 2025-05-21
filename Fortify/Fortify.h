@@ -45,7 +45,7 @@
 #include <string.h>
 
 /* the user's options */
-#include "ufortify.h"
+#include "UFortify.h"
 
 /* Ensure the configuration parameters have sensible defaults */
 #ifndef FORTIFY_STORAGE
