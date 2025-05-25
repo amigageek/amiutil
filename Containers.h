@@ -39,6 +39,8 @@ Status string_path_join(char** new_string_p, const char* base, const char* suffi
 Status string_prepend(char** to_string_p, const char* prefix);
 Status string_printf(char** new_string_p, const char* format, ...);
 Status string_replace_first(char** in_string_p, const char* match, const char* with);
+Status string_replace_all(char** in_string_p, const char* match, const char* with);
+void string_tolower(char* in_string);
 void string_toupper(char* in_string);
 Status string_truncate(char** string_p, size_t length);
 

@@ -160,6 +160,29 @@ Status string_replace_first(char** in_string_p, const char* match, const char* w
     FINALLY RETURN;
 }
 
+Status string_replace_all(char** in_string_p, const char* match, const char* with) {
+    TRY
+    uint match_from_idx = 0;
+
+    for (char* match_at; (match_at = strstr(&(*in_string_p)[match_from_idx], match)); ) {
+        size_t match_idx = match_at - *in_string_p;
+        size_t with_len = strlen(with);
+
+        CHECK(vector_remove(in_string_p, match_idx, strlen(match)));
+        CHECK(vector_insert(in_string_p, match_idx, with_len, with));
+
+        match_from_idx += with_len;
+    }
+
+    FINALLY RETURN;
+}
+
+void string_tolower(char* in_string) {
+    for (char* iter = in_string; *iter; ++ iter) {
+        *iter = tolower(*iter);
+    }
+}
+
 void string_toupper(char* in_string) {
     for (char* iter = in_string; *iter; ++ iter) {
         *iter = toupper(*iter);
