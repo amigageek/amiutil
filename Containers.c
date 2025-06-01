@@ -68,11 +68,24 @@ Status string_clone_substr(char** new_string_p, const char* original, size_t len
     FINALLY RETURN;
 }
 
+bool string_startswith(const char* test, const char* prefix) {
+    return strncmp(test, prefix, strlen(prefix)) == 0;
+}
+
 bool string_endswith(const char* test, const char* suffix) {
     size_t test_len = strlen(test);
     size_t suffix_len = strlen(suffix);
 
     return ((test_len >= suffix_len) && (strcmp(&test[test_len - suffix_len], suffix) == 0));
+}
+
+uint string_count_substr(const char* test, const char* substr) {
+    uint count = 0;
+    uint substr_len = strlen(substr);
+
+    for (const char* match_from = test; (match_from = strstr(match_from, substr)); match_from += substr_len, ++ count);
+
+    return count;
 }
 
 Status string_new(char** new_string_p, size_t length) {

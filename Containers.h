@@ -29,6 +29,7 @@ void list_remove(List* list, ListNode* node);
 Status string_append(char** to_string_p, const char* suffix);
 Status string_clone(char** new_string_p, const char* original);
 Status string_clone_substr(char** new_string_p, const char* original, size_t length);
+uint string_count_substr(const char* test, const char* substr);
 bool string_endswith(const char* test, const char* suffix);
 void string_free(char** string_p);
 #define string_length(STRING) (vector_length(STRING) - 1)
@@ -40,6 +41,7 @@ Status string_prepend(char** to_string_p, const char* prefix);
 Status string_printf(char** new_string_p, const char* format, ...);
 Status string_replace_first(char** in_string_p, const char* match, const char* with);
 Status string_replace_all(char** in_string_p, const char* match, const char* with);
+bool string_startswith(const char* test, const char* prefix);
 void string_tolower(char* in_string);
 void string_toupper(char* in_string);
 Status string_truncate(char** string_p, size_t length);
